@@ -38,7 +38,7 @@ def synthetic_chirps(
     )
     precip = np.where(wet_today, intensity, 0.0).astype("float32")
 
-    ds = xr.Dataset(
+    return xr.Dataset(
         data_vars={
             "precip": (
                 ("time", "lat", "lon"),
@@ -65,7 +65,6 @@ def synthetic_chirps(
             "Conventions": "CF-1.8",
         },
     )
-    return ds
 
 
 def synthetic_chirps_multiyear(
