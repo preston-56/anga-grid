@@ -18,32 +18,76 @@ def compute_spi(
     dist: str = "gamma",
 ) -> xr.DataArray:
     if window_months < 1:
-        raise IndicatorError(f"window_months must be ≥ 1, got {window_months}")
+        raise IndicatorError(f"window_months must be >= 1, got {window_months}")
     if "time" not in pr.dims:
         raise IndicatorError("input DataArray must have a 'time' dimension")
+
+    units = pr.attrs.get("units", "mm/day")
+    pr_with_units = pr.copy()
+    pr_with_units.attrs["units"] = units
 
     if baseline is None and pr.sizes["time"] > 0:
         years = pr["time"].dt.year
         baseline = (int(years.min().item()), int(years.max().item()))
 
-    monthly = pr.resample(time="MS").sum(skipna=True)
-    rolling = monthly.rolling(time=window_months, min_periods=window_months).sum()
+    result = _spi_via_xclim(pr_with_units, window_months, dist, baseline)
+    if result is None:
+        result = _spi_fallback(pr_with_units, window_months, baseline)
 
     if season is not None:
-        rolling = season.subset(rolling)
+        result = season.subset(result)
 
-    standardized = _standardize(rolling, baseline=baseline)
-
-    standardized.attrs["indicator"] = "spi"
-    standardized.attrs["window_months"] = window_months
-    standardized.attrs["distribution"] = dist
+    result.attrs["indicator"] = "spi"
+    result.attrs["window_months"] = window_months
+    result.attrs["distribution"] = dist
     if baseline is not None:
-        standardized.attrs["baseline"] = f"{baseline[0]}-{baseline[1]}"
+        result.attrs["baseline"] = f"{baseline[0]}-{baseline[1]}"
     if season is not None:
-        standardized.attrs["season"] = season.name
+        result.attrs["season"] = season.name
         if season.definition_source:
-            standardized.attrs["season_source"] = season.definition_source
-    return standardized
+            result.attrs["season_source"] = season.definition_source
+    return result
+
+
+def _spi_via_xclim(
+    pr: xr.DataArray,
+    window_months: int,
+    dist: str,
+    baseline: tuple[int, int] | None,
+) -> xr.DataArray | None:
+    try:
+        from xclim.indices import standardized_precipitation_index
+    except ImportError:
+        return None
+
+    cal_start = f"{baseline[0]}-01-01" if baseline is not None else None
+    cal_end = f"{baseline[1]}-12-31" if baseline is not None else None
+
+    try:
+        result = standardized_precipitation_index(
+            pr=pr,
+            freq="MS",
+            window=window_months,
+            dist=dist,
+            method="APP",
+            cal_start=cal_start,
+            cal_end=cal_end,
+        )
+    except (TypeError, ValueError):
+        return None
+    return result
+
+
+def _spi_fallback(
+    pr: xr.DataArray,
+    window_months: int,
+    baseline: tuple[int, int] | None,
+) -> xr.DataArray:
+    monthly = pr.resample(time="MS").sum(skipna=True)
+    rolling = monthly.rolling(
+        time=window_months, min_periods=window_months
+    ).sum()
+    return _standardize(rolling, baseline)
 
 
 def _standardize(

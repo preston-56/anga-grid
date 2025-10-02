@@ -3,6 +3,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
+import numpy as np
+
 from anga_grid.exceptions import IndicatorError
 
 if TYPE_CHECKING:
@@ -28,25 +30,34 @@ def detect_onset(
     season: Season | None = None,
     criteria: OnsetCriteria = DEFAULT_CRITERIA,
 ) -> xr.DataArray:
+    import xarray as xr
+
     if "time" not in pr.dims:
         raise IndicatorError("input must have a 'time' dimension")
 
-    work = pr
-    if season is not None:
-        work = season.subset(work)
+    work = pr if season is None else season.subset(pr)
+    if work.sizes.get("time", 0) == 0:
+        raise IndicatorError("no time samples within the requested window")
 
-    wet = work.rolling(
-        time=criteria.wet_window_days, min_periods=criteria.wet_window_days
-    ).sum() >= criteria.wet_threshold_mm
+    doys = work["time"].dt.dayofyear.astype("int32").values
 
-    is_dry = work < criteria.dry_threshold_mm
-    longest_dry_run = _max_consecutive_true(
-        is_dry, window=criteria.followup_days
+    onset = xr.apply_ufunc(
+        _onset_1d,
+        work,
+        kwargs={
+            "doys": doys,
+            "wet_win": criteria.wet_window_days,
+            "wet_thresh": criteria.wet_threshold_mm,
+            "follow": criteria.followup_days,
+            "dry_days": criteria.dry_spell_days,
+            "dry_thresh": criteria.dry_threshold_mm,
+        },
+        input_core_dims=[["time"]],
+        output_core_dims=[[]],
+        vectorize=True,
+        dask="forbidden",
+        output_dtypes=[np.float64],
     )
-    no_dry_spell = longest_dry_run < criteria.dry_spell_days
-
-    candidate = wet & no_dry_spell.shift(time=-(criteria.wet_window_days - 1))
-    onset = _first_true_doy(candidate)
 
     onset.attrs["indicator"] = "onset"
     onset.attrs["wet_window_days"] = criteria.wet_window_days
@@ -54,32 +65,45 @@ def detect_onset(
     onset.attrs["followup_days"] = criteria.followup_days
     onset.attrs["dry_spell_days"] = criteria.dry_spell_days
     onset.attrs["dry_threshold_mm"] = criteria.dry_threshold_mm
+    onset.attrs["units"] = "day_of_year"
     if season is not None:
         onset.attrs["season"] = season.name
+        if season.definition_source:
+            onset.attrs["season_source"] = season.definition_source
     return onset
 
 
-def _max_consecutive_true(
-    da: xr.DataArray, *, window: int
-) -> xr.DataArray:
-    import numpy as np
-    import xarray as xr
+def _onset_1d(
+    rain: np.ndarray,
+    doys: np.ndarray,
+    wet_win: int,
+    wet_thresh: float,
+    follow: int,
+    dry_days: int,
+    dry_thresh: float,
+) -> float:
+    n = len(rain)
+    last_start = n - wet_win - follow
+    if last_start < 0:
+        return float("nan")
 
-    arr = da.astype("int8")
-    runs = arr.rolling(time=window, min_periods=1).construct("offset")
-    cumulative = runs.cumsum(dim="offset")
-    transition = runs.where(runs == 1, 0).diff("offset", label="upper") == -1
-    longest = cumulative.where(transition).max(dim="offset", skipna=True)
-    fallback = arr.rolling(time=window, min_periods=1).sum()
-    out = xr.where(np.isnan(longest), fallback, longest)
-    return out.transpose(*da.dims)
+    for i in range(last_start + 1):
+        wet_sum = float(rain[i : i + wet_win].sum())
+        if wet_sum < wet_thresh:
+            continue
+        following = rain[i + wet_win : i + wet_win + follow]
+        max_dry = 0
+        current = 0
+        for value in following:
+            if float(value) < dry_thresh:
+                current += 1
+                if current > max_dry:
+                    max_dry = current
+            else:
+                current = 0
+            if max_dry >= dry_days:
+                break
+        if max_dry < dry_days:
+            return float(doys[i])
 
-
-def _first_true_doy(da: xr.DataArray) -> xr.DataArray:
-    import numpy as np
-    import xarray as xr
-
-    doy = da["time"].dt.dayofyear
-    candidate = xr.where(da, doy, np.iinfo("int32").max)
-    first = candidate.min(dim="time")
-    return first.where(first != np.iinfo("int32").max)
+    return float("nan")
