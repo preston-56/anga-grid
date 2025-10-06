@@ -6,9 +6,9 @@ import pytest
 
 from anga_grid.exceptions import AngaGridError
 from anga_grid.types import (
+    REGION_BBOXES,
     BoundingBox,
     GridSpec,
-    REGION_BBOXES,
     TimeRange,
     resolve_region,
 )
