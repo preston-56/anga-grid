@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: test (py${{ matrix.python }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          enable-cache: true
+
+      - name: pin python
+        run: uv python install ${{ matrix.python }}
+
+      - name: install
+        run: uv sync --extra dev --python ${{ matrix.python }}
+
+      - name: ruff
+        run: uv run --python ${{ matrix.python }} ruff check src/ tests/
+
+      - name: mypy
+        run: uv run --python ${{ matrix.python }} mypy src/
+
+      - name: pytest
+        run: uv run --python ${{ matrix.python }} pytest --cov=anga_grid --cov-report=term-missing --cov-fail-under=80
