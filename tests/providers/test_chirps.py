@@ -77,7 +77,9 @@ def test_fetch_writes_provenance_attrs(
     assert "subset_bbox" in ds.attrs
     assert "subset_time" in ds.attrs
     assert "retrieved_at" in ds.attrs
-    assert "bias_caveat" in ds.attrs
+    assert "caveats" in ds.attrs
+    assert "complex topography" in ds.attrs["caveats"]
+    assert "history" in ds.attrs
 
 
 def test_fetch_canonicalizes_alternate_coord_names(tmp_path: Path) -> None:

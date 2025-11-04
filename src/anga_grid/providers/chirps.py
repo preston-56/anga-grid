@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING
 
 from anga_grid.exceptions import ProviderError
 from anga_grid.logging import get_logger
+from anga_grid.provenance import Manifest, stamp
 from anga_grid.types import BoundingBox, TimeRange
 
 if TYPE_CHECKING:
@@ -130,18 +131,21 @@ class CHIRPSProvider:
         bbox: BoundingBox,
         time_range: TimeRange,
     ) -> xr.Dataset:
-        now = datetime.now(UTC).isoformat()
-        ds.attrs.setdefault("source", "CHIRPS-2.0")
-        ds.attrs.setdefault("provider", self.name)
-        ds.attrs["subset_bbox"] = (
-            f"{bbox.min_lat},{bbox.min_lon},{bbox.max_lat},{bbox.max_lon}"
+        m = Manifest(
+            source="CHIRPS-2.0",
+            source_version="2.0",
+            provider=self.name,
+            subset_bbox=(
+                f"{bbox.min_lat},{bbox.min_lon},{bbox.max_lat},{bbox.max_lon}"
+            ),
+            subset_time=(
+                f"{time_range.start.isoformat()}/{time_range.end.isoformat()}"
+            ),
+            retrieved_at=datetime.now(UTC).isoformat(),
         )
-        ds.attrs["subset_time"] = (
-            f"{time_range.start.isoformat()}/{time_range.end.isoformat()}"
-        )
-        ds.attrs["retrieved_at"] = now
-        ds.attrs["bias_caveat"] = (
+        m.add_caveat(
             "CHIRPS underestimates rainfall over complex topography "
             "(Mau Escarpment, Mt. Kenya windward, Aberdares)"
         )
-        return ds
+        m.record("fetch", region_bbox=m.subset_bbox, time_range=m.subset_time)
+        return stamp(ds, m)
