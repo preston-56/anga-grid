@@ -84,7 +84,7 @@ def _record_history(
     if "source" not in result.attrs:
         return
     manifest = Manifest.from_attrs(dict(result.attrs))
-    params = {
+    params: dict[str, object] = {
         "wet_window_days": criteria.wet_window_days,
         "wet_threshold_mm": criteria.wet_threshold_mm,
         "followup_days": criteria.followup_days,

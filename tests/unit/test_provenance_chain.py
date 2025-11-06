@@ -6,8 +6,8 @@ from pathlib import Path
 import pytest
 
 from anga_grid.indicators import compute_spi, detect_onset
-from anga_grid.providers.chirps import CHIRPSProvider
 from anga_grid.provenance import read
+from anga_grid.providers.chirps import CHIRPSProvider
 from anga_grid.season import SEASONS
 from anga_grid.types import BoundingBox, TimeRange
 from tests.fixtures.synthetic import synthetic_chirps_multiyear
