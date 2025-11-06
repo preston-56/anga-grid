@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from anga_grid.exceptions import IndicatorError
+from anga_grid.provenance import Manifest
 
 if TYPE_CHECKING:
     import xarray as xr
@@ -37,6 +38,7 @@ def compute_spi(
     if season is not None:
         result = season.subset(result)
 
+    result.attrs.update(pr.attrs)
     result.attrs["indicator"] = "spi"
     result.attrs["window_months"] = window_months
     result.attrs["distribution"] = dist
@@ -46,7 +48,29 @@ def compute_spi(
         result.attrs["season"] = season.name
         if season.definition_source:
             result.attrs["season_source"] = season.definition_source
+
+    _record_history(result, season, window_months, baseline, dist)
     return result
+
+
+def _record_history(
+    result: xr.DataArray,
+    season: Season | None,
+    window_months: int,
+    baseline: tuple[int, int] | None,
+    dist: str,
+) -> None:
+    if "source" not in result.attrs:
+        return
+    manifest = Manifest.from_attrs(dict(result.attrs))
+    params = {"window_months": window_months, "distribution": dist}
+    if baseline is not None:
+        params["baseline"] = f"{baseline[0]}-{baseline[1]}"
+    if season is not None:
+        params["season"] = season.name
+    manifest.record("compute_spi", **params)
+    for key, value in manifest.as_attrs().items():
+        result.attrs[key] = value
 
 
 def _spi_via_xclim(

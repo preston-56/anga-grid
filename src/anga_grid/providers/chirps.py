@@ -148,4 +148,8 @@ class CHIRPSProvider:
             "(Mau Escarpment, Mt. Kenya windward, Aberdares)"
         )
         m.record("fetch", region_bbox=m.subset_bbox, time_range=m.subset_time)
-        return stamp(ds, m)
+        stamp(ds, m)
+        if "precip" in ds.data_vars:
+            for key, value in m.as_attrs().items():
+                ds["precip"].attrs.setdefault(key, value)
+        return ds

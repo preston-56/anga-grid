@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING
 import numpy as np
 
 from anga_grid.exceptions import IndicatorError
+from anga_grid.provenance import Manifest
 
 if TYPE_CHECKING:
     import xarray as xr
@@ -59,6 +60,7 @@ def detect_onset(
         output_dtypes=[np.float64],
     )
 
+    onset.attrs.update(pr.attrs)
     onset.attrs["indicator"] = "onset"
     onset.attrs["wet_window_days"] = criteria.wet_window_days
     onset.attrs["wet_threshold_mm"] = criteria.wet_threshold_mm
@@ -70,7 +72,29 @@ def detect_onset(
         onset.attrs["season"] = season.name
         if season.definition_source:
             onset.attrs["season_source"] = season.definition_source
+    _record_history(onset, season, criteria)
     return onset
+
+
+def _record_history(
+    result: xr.DataArray,
+    season: Season | None,
+    criteria: OnsetCriteria,
+) -> None:
+    if "source" not in result.attrs:
+        return
+    manifest = Manifest.from_attrs(dict(result.attrs))
+    params = {
+        "wet_window_days": criteria.wet_window_days,
+        "wet_threshold_mm": criteria.wet_threshold_mm,
+        "followup_days": criteria.followup_days,
+        "dry_spell_days": criteria.dry_spell_days,
+    }
+    if season is not None:
+        params["season"] = season.name
+    manifest.record("detect_onset", **params)
+    for key, value in manifest.as_attrs().items():
+        result.attrs[key] = value
 
 
 def _onset_1d(
