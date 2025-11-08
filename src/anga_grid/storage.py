@@ -24,13 +24,15 @@ def detect_format(path: Path) -> Format:
     )
 
 
+ZarrMode = Literal["w", "w-", "a", "a-", "r+", "r"]
+
+
 def write(
     obj: xr.Dataset | xr.DataArray,
     path: Path,
     *,
     fmt: Format | None = None,
-    mode: str = "w",
-    compute: bool = True,
+    mode: ZarrMode = "w",
 ) -> Path:
     import xarray as xr
 
@@ -45,7 +47,7 @@ def write(
         ds = obj
 
     if fmt == "zarr":
-        ds.to_zarr(path, mode=mode, compute=compute)
+        ds.to_zarr(path, mode=mode)
     elif fmt == "netcdf":
         ds.to_netcdf(path)
     else:
