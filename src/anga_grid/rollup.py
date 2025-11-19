@@ -4,8 +4,6 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
-import numpy as np
-
 from anga_grid.exceptions import AngaGridError
 from anga_grid.provenance import Manifest
 from anga_grid.types import BoundingBox
