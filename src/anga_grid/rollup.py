@@ -120,7 +120,7 @@ def _apply_reducer(slab: xr.DataArray, reducer: Reducer) -> xr.DataArray:
     if op == "median":
         return slab.median(dim=("lat", "lon"), skipna=True)
     if op == "count":
-        valid = np.isfinite(slab) if slab.dtype.kind == "f" else slab.astype(bool)
+        valid = slab.notnull() if slab.dtype.kind == "f" else slab.astype(bool)
         return valid.sum(dim=("lat", "lon"))
     raise AngaGridError(f"unknown reducer: {reducer}")
 
