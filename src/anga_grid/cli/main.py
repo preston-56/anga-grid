@@ -3,8 +3,10 @@ from __future__ import annotations
 import click
 
 from anga_grid import __version__
+from anga_grid.cli.classify import classify_cmd
 from anga_grid.cli.compute import compute
 from anga_grid.cli.fetch import fetch
+from anga_grid.cli.rollup import rollup_cmd
 from anga_grid.cli.seasons import seasons
 from anga_grid.logging import configure
 
@@ -27,6 +29,8 @@ def cli(log_level: str, json_log: bool) -> None:
 cli.add_command(fetch)
 cli.add_command(compute)
 cli.add_command(seasons)
+cli.add_command(rollup_cmd)
+cli.add_command(classify_cmd)
 
 
 if __name__ == "__main__":
