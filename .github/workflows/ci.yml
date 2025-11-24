@@ -24,6 +24,7 @@ jobs:
         uses: astral-sh/setup-uv@v3
         with:
           enable-cache: true
+          cache-dependency-glob: "pyproject.toml"
 
       - name: pin python
         run: uv python install ${{ matrix.python }}
