@@ -6,11 +6,8 @@ import pytest
 import xarray as xr
 
 from anga_grid.exceptions import IndicatorError
-from anga_grid.indicators.dry_spell import (
-    DrySpellCriteria,
-    _count_dry_spells,
-    dry_spell_count,
-)
+from anga_grid.indicators.dry_spell import DrySpellCriteria, dry_spell_count
+from anga_grid.indicators.dry_spell.count import _count_dry_spells
 from anga_grid.season import SEASONS
 
 
