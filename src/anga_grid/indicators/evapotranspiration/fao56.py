@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 import numpy as np
 
@@ -18,14 +18,17 @@ if TYPE_CHECKING:
 
 
 def saturation_vapour_pressure(t_celsius: xr.DataArray) -> xr.DataArray:
-    es: xr.DataArray = 0.6108 * np.exp((17.27 * t_celsius) / (t_celsius + 237.3))
-    return es
+    import xarray as xr
+
+    return cast(
+        xr.DataArray,
+        0.6108 * np.exp((17.27 * t_celsius) / (t_celsius + 237.3)),
+    )
 
 
 def slope_saturation_vapour_pressure(t_celsius: xr.DataArray) -> xr.DataArray:
     es = saturation_vapour_pressure(t_celsius)
-    slope: xr.DataArray = (4098.0 * es) / np.power(t_celsius + 237.3, 2.0)
-    return slope
+    return (4098.0 * es) / np.power(t_celsius + 237.3, 2.0)
 
 
 def _psychrometric_constant(elevation_m: float) -> float:
