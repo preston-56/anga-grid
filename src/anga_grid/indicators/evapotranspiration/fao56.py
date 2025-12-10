@@ -18,12 +18,14 @@ if TYPE_CHECKING:
 
 
 def saturation_vapour_pressure(t_celsius: xr.DataArray) -> xr.DataArray:
-    return 0.6108 * np.exp((17.27 * t_celsius) / (t_celsius + 237.3))
+    es: xr.DataArray = 0.6108 * np.exp((17.27 * t_celsius) / (t_celsius + 237.3))
+    return es
 
 
 def slope_saturation_vapour_pressure(t_celsius: xr.DataArray) -> xr.DataArray:
     es = saturation_vapour_pressure(t_celsius)
-    return (4098.0 * es) / np.power(t_celsius + 237.3, 2.0)
+    slope: xr.DataArray = (4098.0 * es) / np.power(t_celsius + 237.3, 2.0)
+    return slope
 
 
 def _psychrometric_constant(elevation_m: float) -> float:
