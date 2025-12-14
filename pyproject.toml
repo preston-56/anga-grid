@@ -88,6 +88,10 @@ testpaths = ["tests"]
 addopts = "-ra --strict-markers"
 markers = [
     "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "smoke: minimum import / wiring tests; selectable via '-m smoke'",
+    "regression: pinned past-bug behaviours, selectable via '-m regression'",
+    "performance: benchmark-shaped tests, selectable via '-m performance'",
+    "roundtrip: write-then-read symmetry tests, selectable via '-m roundtrip'",
 ]
 
 [tool.coverage.run]
