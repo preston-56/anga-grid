@@ -14,8 +14,8 @@ from anga_grid.providers.nex_gddp import (
     NEXGDDPProvider,
 )
 from anga_grid.providers.nex_gddp.scenarios import HISTORICAL, SCENARIOS, get_scenario
+from anga_grid.synthetic.nex_gddp import synthetic_nex_gddp
 from anga_grid.types import BoundingBox, TimeRange
-from tests.fixtures.nex_gddp import synthetic_nex_gddp
 
 _BBOX = BoundingBox(min_lat=-1.2, max_lat=0.2, min_lon=35.6, max_lon=36.4)
 

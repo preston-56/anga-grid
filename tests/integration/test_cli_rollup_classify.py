@@ -7,7 +7,7 @@ import xarray as xr
 from click.testing import CliRunner
 
 from anga_grid.cli.main import cli
-from tests.fixtures.synthetic import synthetic_chirps_multiyear
+from anga_grid.synthetic.chirps import synthetic_chirps_multiyear
 
 
 @pytest.fixture
