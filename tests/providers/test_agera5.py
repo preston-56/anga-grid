@@ -8,8 +8,8 @@ import pytest
 from anga_grid.exceptions import ProviderError
 from anga_grid.provenance import read
 from anga_grid.providers.agera5 import AGERA5_DEFAULT_VARIABLES, AgERA5Provider
+from anga_grid.synthetic.agera5 import synthetic_agera5
 from anga_grid.types import BoundingBox, TimeRange
-from tests.fixtures.agera5 import synthetic_agera5
 
 
 @pytest.fixture

@@ -8,7 +8,7 @@ import xarray as xr
 from anga_grid.exceptions import IndicatorError
 from anga_grid.indicators.spi import compute_spi
 from anga_grid.season import SEASONS
-from tests.fixtures.synthetic import synthetic_chirps_multiyear
+from anga_grid.synthetic.chirps import synthetic_chirps_multiyear
 
 
 def test_spi_rejects_zero_window() -> None:

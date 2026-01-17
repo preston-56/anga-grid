@@ -8,10 +8,10 @@ import pytest
 from anga_grid.providers.agera5 import AgERA5Provider
 from anga_grid.providers.chirps import CHIRPSProvider
 from anga_grid.providers.tamsat import TAMSATProvider
+from anga_grid.synthetic.agera5 import synthetic_agera5
+from anga_grid.synthetic.chirps import synthetic_chirps
+from anga_grid.synthetic.tamsat import synthetic_tamsat
 from anga_grid.types import BoundingBox, TimeRange
-from tests.fixtures.agera5 import synthetic_agera5
-from tests.fixtures.synthetic import synthetic_chirps
-from tests.fixtures.tamsat import synthetic_tamsat
 
 _BBOX = BoundingBox(min_lat=-1.2, max_lat=0.2, min_lon=35.6, max_lon=36.4)
 _TR = TimeRange(start=date(1991, 1, 1), end=date(1991, 1, 31))

@@ -8,8 +8,8 @@ import xarray as xr
 
 from anga_grid.exceptions import ProviderError
 from anga_grid.providers.chirps import CHIRPSProvider
+from anga_grid.synthetic.chirps import synthetic_chirps
 from anga_grid.types import BoundingBox, TimeRange
-from tests.fixtures.synthetic import synthetic_chirps
 
 
 @pytest.fixture

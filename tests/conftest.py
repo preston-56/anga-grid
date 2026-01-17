@@ -3,7 +3,7 @@ from __future__ import annotations
 import pytest
 import xarray as xr
 
-from tests.fixtures.synthetic import synthetic_chirps, synthetic_chirps_multiyear
+from anga_grid.synthetic.chirps import synthetic_chirps, synthetic_chirps_multiyear
 
 
 @pytest.fixture

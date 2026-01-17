@@ -8,8 +8,8 @@ import pytest
 from anga_grid.exceptions import ProviderError
 from anga_grid.provenance import read
 from anga_grid.providers.tamsat import TAMSATProvider
+from anga_grid.synthetic.tamsat import synthetic_tamsat
 from anga_grid.types import BoundingBox, TimeRange
-from tests.fixtures.tamsat import synthetic_tamsat
 
 
 @pytest.fixture
