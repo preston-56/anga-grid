@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import date, datetime
 
 from anga_grid.exceptions import AngaGridError
 
@@ -47,36 +46,6 @@ class BoundingBox:
 
 
 @dataclass(frozen=True, slots=True)
-class TimeRange:
-    start: date
-    end: date
-
-    def __post_init__(self) -> None:
-        s = _coerce_date(self.start)
-        e = _coerce_date(self.end)
-        if s != self.start:
-            object.__setattr__(self, "start", s)
-        if e != self.end:
-            object.__setattr__(self, "end", e)
-        if s > e:
-            raise AngaGridError(f"start {s} after end {e}")
-
-    @property
-    def days(self) -> int:
-        return (self.end - self.start).days + 1
-
-
-def _coerce_date(value: date | datetime | str) -> date:
-    if isinstance(value, datetime):
-        return value.date()
-    if isinstance(value, date):
-        return value
-    if isinstance(value, str):
-        return date.fromisoformat(value)
-    raise AngaGridError(f"cannot coerce to date: {value!r}")
-
-
-@dataclass(frozen=True, slots=True)
 class GridSpec:
     resolution_degrees: float
     crs: str = "EPSG:4326"
@@ -95,29 +64,3 @@ class GridSpec:
         rows = int(round(bbox.lat_span / self.resolution_degrees))
         cols = int(round(bbox.lon_span / self.resolution_degrees))
         return rows, cols
-
-
-NAKURU_BBOX = BoundingBox(
-    min_lat=-1.20, max_lat=0.05, min_lon=35.55, max_lon=36.55
-)
-NJORO_BBOX = BoundingBox(
-    min_lat=-0.40, max_lat=-0.25, min_lon=35.90, max_lon=36.05
-)
-MOLO_BBOX = BoundingBox(
-    min_lat=-0.30, max_lat=-0.15, min_lon=35.70, max_lon=35.85
-)
-
-REGION_BBOXES: dict[str, BoundingBox] = {
-    "nakuru": NAKURU_BBOX,
-    "njoro": NJORO_BBOX,
-    "molo": MOLO_BBOX,
-}
-
-
-def resolve_region(name: str) -> BoundingBox:
-    key = name.strip().lower()
-    if key not in REGION_BBOXES:
-        raise AngaGridError(
-            f"unknown region {name!r}; known: {sorted(REGION_BBOXES)}"
-        )
-    return REGION_BBOXES[key]
