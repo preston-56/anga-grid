@@ -24,9 +24,9 @@ def test_json_formatter_emits_json_with_extras(monkeypatch: object) -> None:
     log = logging.Logger("anga_grid.tests.json")
     buf = io.StringIO()
     handler = logging.StreamHandler(buf)
-    from anga_grid.logging import _JSONFormatter
+    from anga_grid.logging import JSONFormatter
 
-    handler.setFormatter(_JSONFormatter())
+    handler.setFormatter(JSONFormatter())
     log.addHandler(handler)
     log.warning("boom", extra={"job_id": "abc-123"})
     handler.flush()
@@ -37,12 +37,12 @@ def test_json_formatter_emits_json_with_extras(monkeypatch: object) -> None:
 
 
 def test_json_formatter_includes_exception() -> None:
-    from anga_grid.logging import _JSONFormatter
+    from anga_grid.logging import JSONFormatter
 
     log = logging.Logger("anga_grid.tests.exc")
     buf = io.StringIO()
     handler = logging.StreamHandler(buf)
-    handler.setFormatter(_JSONFormatter())
+    handler.setFormatter(JSONFormatter())
     log.addHandler(handler)
     try:
         raise RuntimeError("nope")
