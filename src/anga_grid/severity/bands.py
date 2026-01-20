@@ -3,8 +3,6 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
-import numpy as np
-
 from anga_grid.exceptions import AngaGridError
 from anga_grid.provenance import Manifest
 
@@ -29,14 +27,6 @@ KMD_SPI_BANDS: tuple[SeverityBand, ...] = (
     SeverityBand(code=2, label="severely wet", lower=1.5, upper=2.0),
     SeverityBand(code=3, label="extremely wet", lower=2.0, upper=float("inf")),
 )
-
-
-NDMA_LABELS: dict[str, tuple[float, float]] = {
-    "normal": (-1.0, float("inf")),
-    "alert": (-1.5, -1.0),
-    "alarm": (-2.0, -1.5),
-    "emergency": (float("-inf"), -2.0),
-}
 
 
 def classify_spi(
@@ -64,41 +54,6 @@ def classify_spi(
 
     _record_history(out, "classify_spi", len(bands))
     return out
-
-
-def ndma_phase(spi: xr.DataArray) -> xr.DataArray:
-    import xarray as xr
-
-    out = xr.full_like(spi, fill_value="normal", dtype=object)
-    out = xr.where(spi <= -2.0, "emergency", out)
-    out = xr.where((spi > -2.0) & (spi <= -1.5), "alarm", out)
-    out = xr.where((spi > -1.5) & (spi <= -1.0), "alert", out)
-    out = xr.where(spi > -1.0, "normal", out)
-
-    out.attrs.update(spi.attrs)
-    out.attrs["classification"] = "ndma_phase"
-    out.attrs["phases"] = ",".join(NDMA_LABELS.keys())
-
-    _record_history(out, "ndma_phase", len(NDMA_LABELS))
-    return out
-
-
-def severity_summary(
-    classified: xr.DataArray,
-    bands: tuple[SeverityBand, ...] = KMD_SPI_BANDS,
-) -> dict[str, float]:
-    if classified.attrs.get("classification") != "spi_severity":
-        raise AngaGridError(
-            "summary expects an SPI severity classification output"
-        )
-    total = int(classified.size)
-    if total == 0:
-        return {b.label: 0.0 for b in bands}
-    counts: dict[str, int] = {b.label: 0 for b in bands}
-    values = classified.values
-    for band in bands:
-        counts[band.label] = int(np.sum(values == band.code))
-    return {label: count / total for label, count in counts.items()}
 
 
 def _record_history(
