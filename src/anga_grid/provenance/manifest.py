@@ -1,25 +1,10 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from datetime import UTC, datetime
-from typing import TYPE_CHECKING
 
 from anga_grid import __version__
 from anga_grid.exceptions import ProvenanceError
-
-if TYPE_CHECKING:
-    import xarray as xr
-
-
-@dataclass(frozen=True, slots=True)
-class Step:
-    operation: str
-    parameters: dict[str, str] = field(default_factory=dict)
-    timestamp: str = ""
-
-    def serialize(self) -> str:
-        params = ";".join(f"{k}={v}" for k, v in sorted(self.parameters.items()))
-        return f"{self.timestamp}|{self.operation}|{params}"
+from anga_grid.provenance.steps import Step, now_utc, step_from_serialized
 
 
 @dataclass(slots=True)
@@ -59,7 +44,7 @@ class Manifest:
         step = Step(
             operation=operation,
             parameters={k: str(v) for k, v in parameters.items()},
-            timestamp=_now(),
+            timestamp=now_utc(),
         )
         self.steps.append(step)
 
@@ -85,51 +70,5 @@ class Manifest:
             m.caveats = [s.strip() for s in raw_caveats.split(";") if s.strip()]
         raw_history = str(attrs.get("history", ""))
         if raw_history:
-            m.steps = [_step_from_serialized(s) for s in raw_history.split(" | ") if s]
+            m.steps = [step_from_serialized(s) for s in raw_history.split(" | ") if s]
         return m
-
-
-def stamp(ds: xr.Dataset, manifest: Manifest) -> xr.Dataset:
-    for key, value in manifest.as_attrs().items():
-        ds.attrs[key] = value
-    return ds
-
-
-def read(ds: xr.Dataset) -> Manifest:
-    return Manifest.from_attrs(dict(ds.attrs))
-
-
-def merge(parent: Manifest, child: Manifest, operation: str) -> Manifest:
-    merged = Manifest(
-        source=child.source or parent.source,
-        source_version=child.source_version or parent.source_version,
-        provider=child.provider or parent.provider,
-        subset_bbox=child.subset_bbox or parent.subset_bbox,
-        subset_time=child.subset_time or parent.subset_time,
-        retrieved_at=child.retrieved_at or parent.retrieved_at,
-        code_version=child.code_version,
-    )
-    merged.caveats = list({*parent.caveats, *child.caveats})
-    merged.steps = [*parent.steps, *child.steps]
-    merged.record(operation, parent=parent.source, child=child.source)
-    return merged
-
-
-def _now() -> str:
-    return datetime.now(UTC).isoformat(timespec="seconds")
-
-
-def _step_from_serialized(s: str) -> Step:
-    parts = s.split("|", 2)
-    if len(parts) != 3:
-        raise ProvenanceError(f"bad history entry: {s!r}")
-    ts, op, params = parts
-    params_dict: dict[str, str] = {}
-    for kv in params.split(";"):
-        if not kv:
-            continue
-        if "=" not in kv:
-            raise ProvenanceError(f"bad parameter token: {kv!r}")
-        key, value = kv.split("=", 1)
-        params_dict[key] = value
-    return Step(operation=op, parameters=params_dict, timestamp=ts)
