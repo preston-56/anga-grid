@@ -95,3 +95,126 @@ NAKURU_SHORT_RAINS_CALENDAR = CroppingCalendar(
     name="nakuru-short-rains",
     entries=(NAKURU_SHORT_RAINS_MAIZE,),
 )
+
+
+EMBU_MAIZE = CalendarEntry(
+    crop="maize",
+    region="embu",
+    planting_doy=70,
+    days_to_flower=58,
+    days_to_fill=88,
+    days_to_harvest=120,
+    season="long-rains",
+)
+
+EMBU_BEANS = CalendarEntry(
+    crop="beans",
+    region="embu",
+    planting_doy=72,
+    days_to_flower=42,
+    days_to_fill=68,
+    days_to_harvest=92,
+    season="long-rains",
+)
+
+EMBU_LONG_RAINS_CALENDAR = CroppingCalendar(
+    name="embu-long-rains",
+    entries=(EMBU_MAIZE, EMBU_BEANS),
+)
+
+
+KISUMU_MAIZE = CalendarEntry(
+    crop="maize",
+    region="kisumu",
+    planting_doy=64,
+    days_to_flower=60,
+    days_to_fill=85,
+    days_to_harvest=115,
+    season="long-rains",
+)
+
+KISUMU_SORGHUM = CalendarEntry(
+    crop="sorghum",
+    region="kisumu",
+    planting_doy=64,
+    days_to_flower=70,
+    days_to_fill=100,
+    days_to_harvest=130,
+    season="long-rains",
+)
+
+KISUMU_LONG_RAINS_CALENDAR = CroppingCalendar(
+    name="kisumu-long-rains",
+    entries=(KISUMU_MAIZE, KISUMU_SORGHUM),
+)
+
+
+MOMBASA_MAIZE = CalendarEntry(
+    crop="maize",
+    region="mombasa",
+    planting_doy=85,
+    days_to_flower=65,
+    days_to_fill=95,
+    days_to_harvest=125,
+    season="coastal-long-rains",
+)
+
+MOMBASA_GREEN_GRAMS = CalendarEntry(
+    crop="green-grams",
+    region="mombasa",
+    planting_doy=85,
+    days_to_flower=35,
+    days_to_fill=55,
+    days_to_harvest=75,
+    season="coastal-long-rains",
+)
+
+MOMBASA_LONG_RAINS_CALENDAR = CroppingCalendar(
+    name="mombasa-long-rains",
+    entries=(MOMBASA_MAIZE, MOMBASA_GREEN_GRAMS),
+)
+
+
+GARISSA_SORGHUM = CalendarEntry(
+    crop="sorghum",
+    region="garissa",
+    planting_doy=110,
+    days_to_flower=75,
+    days_to_fill=105,
+    days_to_harvest=135,
+    season="northern-unimodal",
+)
+
+GARISSA_GREEN_GRAMS = CalendarEntry(
+    crop="green-grams",
+    region="garissa",
+    planting_doy=110,
+    days_to_flower=38,
+    days_to_fill=58,
+    days_to_harvest=80,
+    season="northern-unimodal",
+)
+
+GARISSA_UNIMODAL_CALENDAR = CroppingCalendar(
+    name="garissa-unimodal",
+    entries=(GARISSA_SORGHUM, GARISSA_GREEN_GRAMS),
+)
+
+
+CALENDARS_BY_REGION: dict[str, CroppingCalendar] = {
+    "nakuru-long-rains": NAKURU_LONG_RAINS_CALENDAR,
+    "nakuru-short-rains": NAKURU_SHORT_RAINS_CALENDAR,
+    "embu-long-rains": EMBU_LONG_RAINS_CALENDAR,
+    "kisumu-long-rains": KISUMU_LONG_RAINS_CALENDAR,
+    "mombasa-long-rains": MOMBASA_LONG_RAINS_CALENDAR,
+    "garissa-unimodal": GARISSA_UNIMODAL_CALENDAR,
+}
+
+
+def get_calendar(name: str) -> CroppingCalendar:
+    key = name.strip().lower()
+    if key not in CALENDARS_BY_REGION:
+        raise AngaGridError(
+            f"unknown calendar {name!r}; available: {sorted(CALENDARS_BY_REGION)}"
+        )
+    return CALENDARS_BY_REGION[key]
