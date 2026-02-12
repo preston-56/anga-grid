@@ -34,8 +34,12 @@ def tercile_classification(
         raise AngaGridError("input DataArray must have a 'time' dimension")
 
     ref = _select_baseline(da, baseline)
-    lower = ref.quantile(lower_pct / 100.0, dim="time")
-    upper = ref.quantile(upper_pct / 100.0, dim="time")
+    lower = ref.quantile(lower_pct / 100.0, dim="time").drop_vars(
+        "quantile", errors="ignore"
+    )
+    upper = ref.quantile(upper_pct / 100.0, dim="time").drop_vars(
+        "quantile", errors="ignore"
+    )
 
     out = xr.full_like(da, fill_value="near-normal", dtype=object)
     out = xr.where(da < lower, "below-normal", out)
@@ -62,7 +66,10 @@ def quintile_classification(
         raise AngaGridError("input DataArray must have a 'time' dimension")
 
     ref = _select_baseline(da, baseline)
-    breaks = [ref.quantile(p / 100.0, dim="time") for p in (20, 40, 60, 80)]
+    breaks = [
+        ref.quantile(p / 100.0, dim="time").drop_vars("quantile", errors="ignore")
+        for p in (20, 40, 60, 80)
+    ]
 
     out = xr.full_like(da, fill_value="near-normal", dtype=object)
     out = xr.where(da < breaks[0], "very-dry", out)
