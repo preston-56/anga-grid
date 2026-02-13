@@ -101,11 +101,23 @@ shared across the agronomists and operational services that need it.
 
 ## Status
 
-**v0.1 — under active development.** Current scope: CHIRPS daily
-rainfall, monthly and seasonal aggregation, SPI computation, onset
-detection. AgERA5 and TAMSAT integration, NEX-GDDP projection
-handling, and county-level rollups are on the roadmap; see
-[doc/roadmap.md](doc/roadmap.md).
+**v0.5 — under active development.** Current operational surface:
+
+- **Providers** (four datasets): CHIRPS-2.0 daily rainfall, AgERA5
+  daily reanalysis (eight variables), TAMSAT-3.1 African rainfall,
+  NEX-GDDP-CMIP6 downscaled projections (five SSP scenarios).
+- **Indicators**: SPI (gamma + fallback standardisation), operational
+  onset, dry-spell counts, growing degree days (maize/sorghum/wheat),
+  reference ET (FAO-56 Penman-Monteith), WRSI for maize/sorghum/beans,
+  annual/seasonal trend, hot/cold/frost/tropical-night counts.
+- **Classifications**: KMD seven-band SPI severity, NDMA four-phase
+  drought categorisation, FEWS-NET tercile and quintile maps.
+- **Spatial aggregation**: bbox-based and polygon-based rollups; ships
+  with the Nakuru ward and county catalog plus cropping calendars for
+  Nakuru, Embu, Kisumu, Mombasa, and Garissa.
+- **Bias correction**: linear scaling, delta change, monthly linear
+  scaling.
+- **Storage**: zarr / NetCDF read/write with manifest preservation.
 
 ## Quick look
 
@@ -134,9 +146,39 @@ anga compute onset \
   --input ./data/chirps-nakuru.zarr \
   --season long-rains-2024 \
   --output ./out/onset-2024.nc
+
+# Roll up SPI to ward-level for the Nakuru wards
+anga rollup \
+  --input ./out/spi3-longrains-nakuru.nc \
+  --scope nakuru-wards \
+  --reducer mean \
+  --output ./out/spi3-by-ward.nc
+
+# Classify SPI into the KMD seven-band severity and print a summary
+anga classify \
+  --input ./out/spi3-longrains-nakuru.nc \
+  --scheme kmd \
+  --summary \
+  --output ./out/severity.nc
+
+# Compute a long-term trend on the seasonal totals
+anga trend \
+  --input ./data/chirps-nakuru.zarr \
+  --season long-rains \
+  --reducer sum \
+  --output ./out/trend.nc
+
+# Tercile classification with an explicit baseline window
+anga quintile \
+  --input ./out/seasonal-totals.nc \
+  --scheme tercile \
+  --baseline 1991-2020 \
+  --output ./out/tercile.nc
 ```
 
-See [examples/](examples/) for worked end-to-end analyses.
+See [examples/](examples/) for worked end-to-end analyses, including
+a full WRSI(maize) computation against CHIRPS + AgERA5 reference ET,
+and the trend + tercile chain over a synthetic decade.
 
 ## Documentation
 
