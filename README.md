@@ -129,14 +129,19 @@ shared across the agronomists and operational services that need it.
 ## Quick look
 
 ```bash
-# Install
-pip install anga-grid
+# Install (uv recommended; pip works inside a venv)
+uv tool install anga-grid
+# or, in a project: uv add anga-grid
+# or, in a venv:    pip install anga-grid
 
-# Fetch CHIRPS rainfall for Nakuru County, 1991–2024
+# Fetch CHIRPS rainfall for Nakuru County, 1991–2024.
+# v0.5 requires --source-override pointing at a local NetCDF/Zarr
+# replica; the network fetch path is roadmap, not shipped.
 anga fetch chirps \
   --region nakuru \
   --start 1991-01-01 \
   --end 2024-12-31 \
+  --source-override ~/data/chirps-v2.0.africa_daily.nc \
   --output ./data/chirps-nakuru.zarr
 
 # Compute SPI-3 for the long rains seasons, using climatological
