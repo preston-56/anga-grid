@@ -1,5 +1,12 @@
 # anga-grid
 
+[![CI](https://github.com/preston-56/anga-grid/actions/workflows/ci.yml/badge.svg)](https://github.com/preston-56/anga-grid/actions/workflows/ci.yml)
+[![Python](https://img.shields.io/badge/python-3.11%20%7C%203.12-blue.svg)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
+[![Coverage](https://img.shields.io/badge/coverage-93%25-brightgreen.svg)](.github/workflows/ci.yml)
+[![Region](https://img.shields.io/badge/region-East%20Africa-orange.svg)](doc/calendars.md)
+
 Gridded climate indicators for East African agriculture — anchored in
 Njoro and Molo (Nakuru County, Kenya), built for agronomy researchers
 and operational drought-monitoring services.
