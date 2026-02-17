@@ -12,6 +12,16 @@ if TYPE_CHECKING:
 
 @dataclass(frozen=True, slots=True)
 class Season:
+    """A named day-of-year window with optional regional applicability.
+
+    start_doy and end_doy are inclusive. When start_doy > end_doy the
+    season wraps the new year (e.g. a December-February window).
+    region restricts where applies_to() returns True; None means
+    'applies everywhere'. definition_source carries onto every
+    indicator output computed against this season so a downstream
+    bulletin reader sees the citation, not just a label.
+    """
+
     name: str
     start_doy: int
     end_doy: int
