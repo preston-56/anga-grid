@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import numpy as np
 import pytest
 import xarray as xr
 
@@ -19,3 +20,8 @@ def chirps_three_years() -> xr.Dataset:
 @pytest.fixture
 def chirps_decade() -> xr.Dataset:
     return synthetic_chirps_multiyear(years=(1991, 2000))
+
+
+@pytest.fixture
+def deterministic_rng() -> np.random.Generator:
+    return np.random.default_rng(2025)
