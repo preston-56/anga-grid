@@ -44,3 +44,11 @@ data/
 *.zarr/
 *.nc
 !tests/fixtures/**/*.nc
+
+# Editor / system droppings
+*~
+*.bak
+.~lock.*
+
+# Jupyter checkpoints picked up by users running examples in notebooks
+.ipynb_checkpoints/
