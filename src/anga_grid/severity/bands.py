@@ -12,6 +12,15 @@ if TYPE_CHECKING:
 
 @dataclass(frozen=True, slots=True)
 class SeverityBand:
+    """One band in a SPI severity classification scheme.
+
+    code is the integer label written into the classified xarray;
+    KMD bands use the conventional -3 (extreme drought) through +3
+    (extremely wet). lower/upper are the SPI thresholds; classify_spi
+    uses inclusive-upper for drought bands and inclusive-lower for
+    wet bands per McKee 1995.
+    """
+
     code: int
     label: str
     lower: float
