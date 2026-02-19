@@ -21,6 +21,7 @@ def seasons_list(fmt: str) -> None:
                 "name": s.name,
                 "start_doy": s.start_doy,
                 "end_doy": s.end_doy,
+                "length_days": s.length_days,
                 "definition_source": s.definition_source,
             }
             for s in SEASONS.values()
