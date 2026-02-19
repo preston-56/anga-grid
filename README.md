@@ -194,16 +194,18 @@ and the trend + tercile chain over a synthetic decade.
 
 ## Documentation
 
-- [Architecture overview](doc/architecture.md) — design decisions and
-  trade-offs
-- [Architecture decision records](doc/adr/) — why specific choices
-  were made
-- [Datasets](doc/datasets.md) — what each source provides, conventions,
-  known caveats
-- [Operations](doc/operations.md) — deployment, configuration,
-  observability
-- [Seasonal calendars](doc/calendars.md) — how anga-grid models East
-  African rainfall seasons and why
+Start at [doc/index.md](doc/index.md) for navigation by audience.
+Highlights:
+
+- [Installation](doc/installation.md) — uv-managed setup.
+- [CLI reference](doc/cli.md) — every subcommand and its flags.
+- [Data sources](doc/data-sources.md) — where to obtain CHIRPS,
+  AgERA5, TAMSAT, NEX-GDDP local replicas.
+- [Operations](doc/operations.md) — monthly drought-bulletin
+  pipeline shape, observability, reproducibility contract.
+- [Troubleshooting](doc/troubleshooting.md) — failure modes and fixes.
+- [Architecture overview](doc/architecture.md) and
+  [decision records](doc/adr/) — the non-obvious design choices.
 
 ## Contributing
 
@@ -211,6 +213,10 @@ Issues and pull requests welcome, especially from agronomists,
 extension officers, and operational meteorologists who can tell us
 where the defaults are wrong. Code-only contributions are also
 welcome.
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the local check loop and
+[doc/contributing-calendars.md](doc/contributing-calendars.md) if
+you're adding a regional cropping calendar.
 
 ## License
 
