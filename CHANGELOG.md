@@ -17,7 +17,21 @@ below is on `main`.
 - Per-region cropping calendars: Embu, Kisumu, Mombasa, Garissa.
 - CLI: `anga trend` and `anga quintile` subcommands.
 - README badges: CI, Python, license, ruff, coverage, region.
-- CONTRIBUTING.md, CHANGELOG.md, doc/installation.md.
+- Project setup docs: CONTRIBUTING.md, CODE_OF_CONDUCT.md, SECURITY.md,
+  CHANGELOG.md, CITATION.cff, doc/installation.md, doc/cli.md,
+  doc/operations.md, doc/data-sources.md, doc/troubleshooting.md,
+  doc/glossary.md, doc/roadmap.md, doc/index.md,
+  doc/contributing-calendars.md.
+- ADRs 0002 (no default network fetch), 0003 (manifest as attrs),
+  0004 (eight test layers).
+- Build infra: Dockerfile, .dockerignore, Makefile, .editorconfig,
+  .pre-commit-config.yaml, .github/dependabot.yml,
+  .github/ISSUE_TEMPLATE/{bug_report,feature_request}.md,
+  .github/PULL_REQUEST_TEMPLATE.md, .github/FUNDING.yml.
+- CI: Python 3.13 added to the test matrix.
+- Storage: `.cdf` accepted as a NetCDF suffix.
+- Tests: hypothesis property tests for cropping windows + temperature
+  extremes monotonicity; synthetic-data builder consistency contract.
 
 ### Changed
 
