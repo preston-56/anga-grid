@@ -13,7 +13,11 @@ from anga_grid.cli.trend import trend_cmd
 from anga_grid.logging import configure
 
 
-@click.group()
+@click.group(
+    help="anga-grid: gridded climate indicators for East African agriculture.\n\n"
+    "Run `anga seasons list` to see the seasonal catalog, "
+    "or `anga <subcommand> --help` for per-command flags.",
+)
 @click.version_option(__version__, prog_name="anga")
 @click.option(
     "--log-level",
