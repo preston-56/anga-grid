@@ -13,6 +13,11 @@ updates:
     commit-message:
       prefix: "deps"
       include: "scope"
+    ignore:
+      # zarr 3.x is a breaking rewrite; pinned <3 deliberately until
+      # the upstream xarray + zarr-3 stack is proven on this codebase.
+      - dependency-name: "zarr"
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: "github-actions"
     directory: "/"
