@@ -40,7 +40,7 @@ coverage.xml
 .DS_Store
 
 # Local data caches
-data/
+/data/
 *.zarr/
 *.nc
 !tests/fixtures/**/*.nc
