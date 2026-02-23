@@ -128,64 +128,85 @@ shared across the agronomists and operational services that need it.
 
 ## Quick look
 
+### Install
+
 ```bash
-# Install (uv recommended; pip works inside a venv)
+# Two install modes; pick the one that matches your situation.
+
+# (a) As a system tool, on PATH everywhere:
 uv tool install anga-grid
-# or, in a project: uv add anga-grid
-# or, in a venv:    pip install anga-grid
 
-# Fetch CHIRPS rainfall for Nakuru County, 1991–2024.
-# v0.5 requires --source-override pointing at a local NetCDF/Zarr
-# replica; the network fetch path is roadmap, not shipped.
-anga fetch chirps \
-  --region nakuru \
+# (b) Inside a uv-managed project:
+uv add anga-grid
+
+# (c) Inside a plain venv (PEP 668 systems will reject pip outside a venv):
+pip install anga-grid
+```
+
+### Run
+
+The commands below work on a fresh clone — they point at the
+committed synthetic fixtures under `tests/fixtures/data/`. Substitute
+your real CHIRPS / AgERA5 path when you have one.
+
+If you installed via mode (b) or are running from a checkout, prefix
+each command with `uv run` (or `source .venv/bin/activate` once and
+drop the prefix). Mode (a) puts `anga` on PATH directly.
+
+```bash
+mkdir -p out
+
+# Fetch a CHIRPS subset over Njoro from the committed fixture.
+# In v0.6 --source-override goes away in favour of network fetch.
+uv run anga fetch chirps \
+  --region njoro \
   --start 1991-01-01 \
-  --end 2024-12-31 \
-  --source-override ~/data/chirps-v2.0.africa_daily.nc \
-  --output ./data/chirps-nakuru.zarr
+  --end 1995-12-31 \
+  --source-override tests/fixtures/data/chirps_njoro_1991_1995.nc \
+  --output out/chirps-njoro.nc
 
-# Compute SPI-3 for the long rains seasons, using climatological
-# baseline 1991–2020
-anga compute spi \
-  --input ./data/chirps-nakuru.zarr \
+# Compute SPI-3 for the long rains, against the in-window baseline.
+uv run anga compute spi \
+  --input out/chirps-njoro.nc \
   --window 3 \
   --season long-rains \
-  --baseline 1991-2020 \
-  --output ./out/spi3-longrains-nakuru.nc
+  --baseline 1991-1995 \
+  --output out/spi3-longrains-njoro.nc
 
-# Detect onset of long rains for the 2024 season
-anga compute onset \
-  --input ./data/chirps-nakuru.zarr \
-  --season long-rains-2024 \
-  --output ./out/onset-2024.nc
+# Detect long-rains onset for each year in the input.
+uv run anga compute onset \
+  --input out/chirps-njoro.nc \
+  --season long-rains \
+  --output out/onset-longrains.nc
 
-# Roll up SPI to ward-level for the Nakuru wards
-anga rollup \
-  --input ./out/spi3-longrains-nakuru.nc \
-  --scope nakuru-wards \
+# Roll up SPI to county-level (the Njoro fixture sits inside the
+# Nakuru county bbox; for ward-level rollups use a wider input).
+uv run anga rollup \
+  --input out/spi3-longrains-njoro.nc \
+  --scope nakuru-county \
   --reducer mean \
-  --output ./out/spi3-by-ward.nc
+  --output out/spi3-county.nc
 
-# Classify SPI into the KMD seven-band severity and print a summary
-anga classify \
-  --input ./out/spi3-longrains-nakuru.nc \
+# Classify SPI into the KMD seven-band severity, print a summary.
+uv run anga classify \
+  --input out/spi3-longrains-njoro.nc \
   --scheme kmd \
   --summary \
-  --output ./out/severity.nc
+  --output out/severity.nc
 
-# Compute a long-term trend on the seasonal totals
-anga trend \
-  --input ./data/chirps-nakuru.zarr \
+# Compute a long-term seasonal trend.
+uv run anga trend \
+  --input out/chirps-njoro.nc \
   --season long-rains \
   --reducer sum \
-  --output ./out/trend.nc
+  --output out/trend.nc
 
-# Tercile classification with an explicit baseline window
-anga quintile \
-  --input ./out/seasonal-totals.nc \
+# Tercile classification with an explicit baseline window.
+uv run anga quintile \
+  --input out/spi3-longrains-njoro.nc \
   --scheme tercile \
-  --baseline 1991-2020 \
-  --output ./out/tercile.nc
+  --baseline 1991-1995 \
+  --output out/tercile.nc
 ```
 
 See [examples/](examples/) for worked end-to-end analyses, including
