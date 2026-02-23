@@ -119,20 +119,87 @@ def test_nex_gddp_provider_consumes_fixture_via_source_override(
     assert "precipitation" in ds.data_vars
 
 
-@pytest.mark.parametrize(
-    "filename",
-    [
-        "chirps_njoro_1991.nc",
-        "chirps_njoro_1991_1995.nc",
-        "agera5_njoro_1991_long_rains.nc",
-        "tamsat_njoro_1991.nc",
-        "nex_gddp_njoro_ssp245_2030.nc",
-    ],
+_ALL_FIXTURES = (
+    "chirps_njoro_1991.nc",
+    "chirps_njoro_1991_1995.nc",
+    "chirps_njoro_1991_2020.nc",
+    "chirps_kisumu_1991.nc",
+    "chirps_mombasa_1991.nc",
+    "agera5_njoro_1991_long_rains.nc",
+    "agera5_njoro_1991_full_year.nc",
+    "tamsat_njoro_1991.nc",
+    "tamsat_njoro_1991_1995.nc",
+    "nex_gddp_njoro_ssp126_2030.nc",
+    "nex_gddp_njoro_ssp245_2030.nc",
+    "nex_gddp_njoro_ssp585_2030.nc",
 )
-def test_every_fixture_under_500kb(filename: str) -> None:
+
+
+@pytest.mark.parametrize("filename", _ALL_FIXTURES)
+def test_every_fixture_under_2mb(filename: str) -> None:
     path = _FIXTURE_DIR / filename
     assert path.exists(), f"missing {path}"
-    assert path.stat().st_size < 500_000, (
-        f"{filename} is larger than the 500 KB sanity cap; "
+    assert path.stat().st_size < 2_000_000, (
+        f"{filename} is larger than the 2 MB sanity cap; "
         f"either shrink the bbox/period or add a deliberate exception"
     )
+
+
+def test_combined_fixture_set_under_4mb() -> None:
+    total = sum(
+        (_FIXTURE_DIR / name).stat().st_size for name in _ALL_FIXTURES
+    )
+    assert total < 4_000_000, (
+        f"committed fixtures total {total / 1024 / 1024:.2f} MB; "
+        f"keep the set under 4 MB so the repo zip stays manageable"
+    )
+
+
+def test_chirps_njoro_climatology_baseline_spans_30_years() -> None:
+    path = _FIXTURE_DIR / "chirps_njoro_1991_2020.nc"
+    assert path.exists(), f"missing {path}"
+    ds = xr.open_dataset(path)
+    years = ds["time"].dt.year.values
+    assert int(years.min()) == 1991
+    assert int(years.max()) == 2020
+
+
+def test_chirps_kisumu_fixture_present() -> None:
+    path = _FIXTURE_DIR / "chirps_kisumu_1991.nc"
+    assert path.exists(), f"missing {path}"
+    ds = xr.open_dataset(path)
+    assert "precip" in ds.data_vars
+    assert float(ds["lat"].mean()) > -1.0
+
+
+def test_chirps_mombasa_fixture_is_coastal_bbox() -> None:
+    path = _FIXTURE_DIR / "chirps_mombasa_1991.nc"
+    assert path.exists(), f"missing {path}"
+    ds = xr.open_dataset(path)
+    assert -4.5 < float(ds["lat"].mean()) < -3.5
+    assert 39.0 < float(ds["lon"].mean()) < 40.0
+
+
+def test_agera5_full_year_has_365_or_366_days() -> None:
+    path = _FIXTURE_DIR / "agera5_njoro_1991_full_year.nc"
+    assert path.exists(), f"missing {path}"
+    ds = xr.open_dataset(path)
+    assert ds.sizes["time"] in (365, 366)
+
+
+def test_tamsat_multiyear_fixture_spans_five_years() -> None:
+    path = _FIXTURE_DIR / "tamsat_njoro_1991_1995.nc"
+    assert path.exists(), f"missing {path}"
+    ds = xr.open_dataset(path)
+    years = ds["time"].dt.year.values
+    assert int(years.min()) == 1991
+    assert int(years.max()) == 1995
+
+
+@pytest.mark.parametrize("scenario", ["ssp126", "ssp245", "ssp585"])
+def test_nex_gddp_three_scenarios_present(scenario: str) -> None:
+    path = _FIXTURE_DIR / f"nex_gddp_njoro_{scenario}_2030.nc"
+    assert path.exists(), f"missing {path}"
+    ds = xr.open_dataset(path)
+    assert "tas" in ds.data_vars
+    assert "pr" in ds.data_vars
