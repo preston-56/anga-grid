@@ -14,8 +14,7 @@ RUN pip install --no-cache-dir uv==0.4.18
 
 WORKDIR /app
 
-COPY pyproject.toml README.md LICENSE ./
-COPY src/ ./src/
+COPY . .
 
 RUN uv pip install --system --no-cache .
 
