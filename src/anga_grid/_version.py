@@ -6,4 +6,4 @@ stability contract; until then the dev0 marker is intentional and
 warns consumers the API may shift.
 """
 
-VERSION = "0.5.2"
+VERSION = "0.5.3"
