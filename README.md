@@ -1,11 +1,4 @@
-# anga-grid
-
-[![CI](https://github.com/preston-56/anga-grid/actions/workflows/ci.yml/badge.svg)](https://github.com/preston-56/anga-grid/actions/workflows/ci.yml)
-[![Python](https://img.shields.io/badge/python-3.11%20%7C%203.12-blue.svg)](https://www.python.org/downloads/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
-[![Coverage](https://img.shields.io/badge/coverage-93%25-brightgreen.svg)](.github/workflows/ci.yml)
-[![Region](https://img.shields.io/badge/region-East%20Africa-orange.svg)](doc/calendars.md)
+![alt text](image.png)
 
 Gridded climate indicators for East African agriculture — anchored in
 Njoro and Molo (Nakuru County, Kenya), built for agronomy researchers
@@ -209,24 +202,21 @@ uv run anga quintile \
   --output out/tercile.nc
 ```
 
-See [examples/](examples/) for worked end-to-end analyses, including
+See [examples](https://github.com/preston-56/anga-grid/tree/main/examples) for worked end-to-end analyses, including
 a full WRSI(maize) computation against CHIRPS + AgERA5 reference ET,
 and the trend + tercile chain over a synthetic decade.
 
 ## Documentation
 
-Start at [doc/index.md](doc/index.md) for navigation by audience.
-Highlights:
+Start at [Documentation](https://github.com/preston-56/anga-grid/tree/main/doc)
 
-- [Installation](doc/installation.md) — uv-managed setup.
-- [CLI reference](doc/cli.md) — every subcommand and its flags.
-- [Data sources](doc/data-sources.md) — where to obtain CHIRPS,
-  AgERA5, TAMSAT, NEX-GDDP local replicas.
-- [Operations](doc/operations.md) — monthly drought-bulletin
-  pipeline shape, observability, reproducibility contract.
-- [Troubleshooting](doc/troubleshooting.md) — failure modes and fixes.
-- [Architecture overview](doc/architecture.md) and
-  [decision records](doc/adr/) — the non-obvious design choices.
+- [Installation](https://github.com/preston-56/anga-grid/blob/main/doc/installation.md)
+- [CLI reference](https://github.com/preston-56/anga-grid/blob/main/doc/cli.md)
+- [Data sources](https://github.com/preston-56/anga-grid/blob/main/doc/data-sources.md)
+- [Operations](https://github.com/preston-56/anga-grid/blob/main/doc/operations.md)
+- [Troubleshooting](https://github.com/preston-56/anga-grid/blob/main/doc/troubleshooting.md)
+- [Architecture overview](https://github.com/preston-56/anga-grid/blob/main/doc/architecture.md)
+- [Decision records](https://github.com/preston-56/anga-grid/tree/main/doc/adr)
 
 ## Contributing
 
@@ -235,13 +225,12 @@ extension officers, and operational meteorologists who can tell us
 where the defaults are wrong. Code-only contributions are also
 welcome.
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for the local check loop and
-[doc/contributing-calendars.md](doc/contributing-calendars.md) if
-you're adding a regional cropping calendar.
+See [CONTRIBUTING.md](https://github.com/preston-56/anga-grid/blob/main/CONTRIBUTING.md) for the local check loop and
+[doc/contributing-calendars.md](https://github.com/preston-56/anga-grid/blob/main/doc/contributing-calendars.md)
 
 ## License
 
-MIT. See [LICENSE](LICENSE).
+MIT. See [LICENSE](https://github.com/preston-56/anga-grid/blob/main/LICENSE).
 
 ## Acknowledgements
 
