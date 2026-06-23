@@ -74,7 +74,3 @@ it might silently fix something CI's older version flags. Run
 `uv pip install --upgrade-package ruff` and the local check should
 match.
 
-
-
-
-
