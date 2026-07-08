@@ -13,10 +13,10 @@ jobs:
     name: build distributions
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: install uv
-        uses: astral-sh/setup-uv@v3
+        uses: astral-sh/setup-uv@v8
 
       - name: check tag matches version
         run: |
@@ -31,7 +31,7 @@ jobs:
         run: uv build
 
       - name: upload dist
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: dist
           path: dist/
@@ -47,7 +47,7 @@ jobs:
       id-token: write
     steps:
       - name: download dist
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: dist
           path: dist/
