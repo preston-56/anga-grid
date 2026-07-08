@@ -93,6 +93,7 @@ markers = [
     "regression: pinned past-bug behaviours, selectable via '-m regression'",
     "performance: benchmark-shaped tests, selectable via '-m performance'",
     "roundtrip: write-then-read symmetry tests, selectable via '-m roundtrip'",
+    "property: property-based tests, selectable via '-m property'",
 ]
 
 [tool.coverage.run]
